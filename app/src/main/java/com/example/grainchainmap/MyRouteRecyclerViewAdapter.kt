@@ -1,49 +1,74 @@
 package com.example.grainchainmap
 
+import android.content.Context
 import androidx.recyclerview.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 
-import com.example.grainchainmap.placeholder.PlaceholderContent.PlaceholderItem
-import com.example.grainchainmap.databinding.FragmentItemBinding
+import com.example.grainchainmap.databinding.FragmentItemRouteBinding
+import com.example.grainchainmap.databinding.FragmentMapBinding
+import com.example.grainchainmap.databinding.RouteListBottomSheetBinding
+import com.example.grainchainmap.placeholder.Route
 
 /**
  * [RecyclerView.Adapter] that can display a [PlaceholderItem].
  * TODO: Replace the implementation with code for your data type.
  */
-class MyRouteRecyclerViewAdapter(
-    private val values: List<PlaceholderItem>
+class MyRouteRecyclerViewAdapter( private val listener: RouteItemListener
 ) : RecyclerView.Adapter<MyRouteRecyclerViewAdapter.ViewHolder>() {
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+    interface RouteItemListener{
+        fun onclickRouteItem(v:View, route:Route)
+    }
 
+    private val routes = mutableListOf<Route>()
+    private lateinit var context: Context
+
+    fun addRoutes( myRoutes: ArrayList<Route>){
+        this.routes.addAll(myRoutes)
+        notifyDataSetChanged()
+    }
+
+    fun clearRoutes(){
+        this.routes.clear()
+        notifyDataSetChanged()
+    }
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         return ViewHolder(
-            FragmentItemBinding.inflate(
+            FragmentItemRouteBinding.inflate(
                 LayoutInflater.from(parent.context),
                 parent,
                 false
-            )
+            ), listener
         )
-
     }
 
-    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val item = values[position]
-        holder.idView.text = "${item.id} Km"
-        holder.contentView.text = item.content
-    }
+    override fun onBindViewHolder(holder: ViewHolder, position: Int) = holder.bind(routes[position])
+    override fun getItemCount(): Int = routes.size
 
-    override fun getItemCount(): Int = values.size
+    inner class ViewHolder(binding: FragmentItemRouteBinding, private val listener:MyRouteRecyclerViewAdapter.RouteItemListener) : RecyclerView.ViewHolder(binding.root),
+        View.OnClickListener {
+        private  lateinit var route: Route
+        val tvKm: TextView = binding.tvKm
+        val tvRouteName: TextView = binding.tvRouteName
 
-    inner class ViewHolder(binding: FragmentItemBinding) : RecyclerView.ViewHolder(binding.root) {
-        val idView: TextView = binding.tvKm
-        val contentView: TextView = binding.tvRouteName
-
-        override fun toString(): String {
-            return super.toString() + " '" + contentView.text + "'"
+        init{
+            binding.root.setOnClickListener(this)
         }
+        
+        fun bind(route: Route){
+            this.route = route
+            tvKm.text = "${route.km} Km"
+            tvRouteName.text = route.name
+        }
+
+        override fun onClick(v: View?) {
+            listener.onclickRouteItem(v!!, this.route)
+        }
+
     }
 
 }
