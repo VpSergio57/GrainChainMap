@@ -7,18 +7,34 @@
     android:layout_height="match_parent"
     app:behavior_hideable="false"
     app:behavior_peekHeight="200dp"
+    android:backgroundTint="@color/orange_200"
     android:elevation="10dp"
     android:background="@drawable/bottom_sheet_list_rounded"
     >
+
+    <View
+        android:id="@+id/pestania"
+        android:layout_width="35dp"
+        android:layout_height="5dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="10dp"
+        android:background="@drawable/border_pestania_shape"
+        app:layout_constraintBottom_toTopOf="@+id/list"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/list"
         android:name="com.example.grainchainmap.RouteFragment"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginLeft="16dp"
-        android:layout_marginRight="16dp"
+        android:layout_height="0dp"
         app:layoutManager="LinearLayoutManager"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="@id/pestania"
+        app:layout_constraintStart_toStartOf="@id/pestania"
+        app:layout_constraintTop_toBottomOf="@id/pestania"
+        app:layout_constraintVertical_bias="0.0"
         tools:context=".RouteFragment"
         tools:listitem="@layout/fragment_item" />
 

@@ -31,15 +31,15 @@ class MyRouteRecyclerViewAdapter(
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val item = values[position]
-        holder.idView.text = item.id
+        holder.idView.text = "${item.id} Km"
         holder.contentView.text = item.content
     }
 
     override fun getItemCount(): Int = values.size
 
     inner class ViewHolder(binding: FragmentItemBinding) : RecyclerView.ViewHolder(binding.root) {
-        val idView: TextView = binding.itemNumber
-        val contentView: TextView = binding.content
+        val idView: TextView = binding.tvKm
+        val contentView: TextView = binding.tvRouteName
 
         override fun toString(): String {
             return super.toString() + " '" + contentView.text + "'"
