@@ -6,6 +6,11 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.example.grainchainmap.databinding.FragmentMapBinding
+import com.example.grainchainmap.placeholder.PlaceholderContent
 
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
@@ -15,6 +20,11 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 
 class MapFragment : Fragment() {
+
+    private var _binding:FragmentMapBinding? = null
+    private val binding get() = _binding!!
+
+    private var columnCount = 1
 
     private val callback = OnMapReadyCallback { googleMap ->
         /**
@@ -36,7 +46,20 @@ class MapFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        return inflater.inflate(R.layout.fragment_map, container, false)
+
+        _binding = FragmentMapBinding.inflate(inflater, container, false)
+
+        val bottomSheetList = binding.bottomSheet.list
+        if (bottomSheetList is RecyclerView) {
+            with(bottomSheetList) {
+                layoutManager = when {
+                    columnCount <= 1 -> LinearLayoutManager(context)
+                    else -> GridLayoutManager(context, columnCount)
+                }
+                adapter = MyRouteRecyclerViewAdapter(PlaceholderContent.ITEMS)
+            }
+        }
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
