@@ -58,7 +58,7 @@ class MyRouteRecyclerViewAdapter( private val listener: RouteItemListener
         init{
             binding.root.setOnClickListener(this)
         }
-        
+
         fun bind(route: Route){
             this.route = route
             tvKm.text = "${route.km} Km"

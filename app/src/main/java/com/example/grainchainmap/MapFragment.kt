@@ -14,13 +14,16 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.grainchainmap.databinding.FragmentMapBinding
 import com.example.grainchainmap.placeholder.LatLngData
 import com.example.grainchainmap.placeholder.Route
+import com.example.grainchainmap.utils.Permissions
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
+import com.vmadalin.easypermissions.EasyPermissions
+import com.vmadalin.easypermissions.dialogs.SettingsDialog
 
-class MapFragment : Fragment(), MyRouteRecyclerViewAdapter.RouteItemListener {
+class MapFragment : Fragment(), MyRouteRecyclerViewAdapter.RouteItemListener, EasyPermissions.PermissionCallbacks  {
 
     private var _binding:FragmentMapBinding? = null
     private val binding get() = _binding!!
@@ -89,11 +92,46 @@ class MapFragment : Fragment(), MyRouteRecyclerViewAdapter.RouteItemListener {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        if(Permissions.hasLocationPermission(requireContext())){
+            startMapLocation()
+        }else{
+            Permissions.requestLocationPermission(this)
+        }
+    }
+
+    private fun startMapLocation(){
         val mapFragment = childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment?
         mapFragment?.getMapAsync(callback)
     }
 
     override fun onclickRouteItem(v: View, route: Route) {
         Toast.makeText(requireContext(), "${route.name} son ${route.km}", Toast.LENGTH_SHORT).show()
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        EasyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults, this)
+    }
+
+    override fun onPermissionsDenied(requestCode: Int, perms: List<String>) {
+        if(EasyPermissions.somePermissionPermanentlyDenied(this, perms)){
+            SettingsDialog.Builder(requireActivity()).build().show()
+        } else{
+            Permissions.requestLocationPermission(this)
+        }
+    }
+
+    override fun onPermissionsGranted(requestCode: Int, perms: List<String>) {
+        Toast.makeText(requireContext(), "Permisos Aceptados!!", Toast.LENGTH_SHORT).show()
+        startMapLocation()
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 }
