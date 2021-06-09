@@ -8,7 +8,8 @@ import android.view.ViewGroup
 import android.widget.TextView
 
 import com.example.grainchainmap.databinding.FragmentItemRouteBinding
-import com.example.grainchainmap.placeholder.RouteEntity
+import com.example.grainchainmap.placeholder.Route
+import java.util.*
 
 /**
  * [RecyclerView.Adapter] that can display a [PlaceholderItem].
@@ -18,13 +19,13 @@ class MyRouteRecyclerViewAdapter( private val listener: RouteItemListener
 ) : RecyclerView.Adapter<MyRouteRecyclerViewAdapter.ViewHolder>() {
 
     interface RouteItemListener{
-        fun onclickRouteItem(v:View, route:RouteEntity)
+        fun onclickRouteItem(v:View, route:Route)
     }
 
-    private val routes = mutableListOf<RouteEntity>()
+    private val routes = mutableListOf<Route>()
     private lateinit var context: Context
 
-    fun addRoutes( myRoutes: ArrayList<RouteEntity>){
+    fun addRoutes( myRoutes: ArrayList<Route>){
         this.routes.addAll(myRoutes)
         notifyDataSetChanged()
     }
@@ -49,7 +50,7 @@ class MyRouteRecyclerViewAdapter( private val listener: RouteItemListener
 
     inner class ViewHolder(binding: FragmentItemRouteBinding, private val listener:MyRouteRecyclerViewAdapter.RouteItemListener) : RecyclerView.ViewHolder(binding.root),
         View.OnClickListener {
-        private  lateinit var route: RouteEntity
+        private  lateinit var route: Route
         val tvKm: TextView = binding.tvKm
         val tvRouteName: TextView = binding.tvRouteName
 
@@ -57,7 +58,7 @@ class MyRouteRecyclerViewAdapter( private val listener: RouteItemListener
             binding.root.setOnClickListener(this)
         }
 
-        fun bind(route: RouteEntity){
+        fun bind(route: Route){
             this.route = route
             tvKm.text = "${route.km} Km"
             tvRouteName.text = route.name

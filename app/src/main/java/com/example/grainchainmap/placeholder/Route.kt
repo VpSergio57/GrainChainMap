@@ -8,7 +8,7 @@ import kotlinx.parcelize.Parcelize
 
 @Parcelize
 @Entity( tableName = "RouteEntity" )
-data class RouteEntity(
+data class Route(
     @PrimaryKey(autoGenerate = true) var id:Int = 0,
     var name:String = "",
     var km:Float = 0f,
