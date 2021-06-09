@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".DetailsFragment">
+    tools:context=".Presentation.DetailsModule.DetailsFragment">
 
 
     <fragment
@@ -16,7 +16,7 @@
         app:layout_constraintEnd_toStartOf="@+id/guideline3"
         app:layout_constraintStart_toStartOf="@+id/guideline2"
         app:layout_constraintTop_toTopOf="parent"
-        tools:context=".DetailsFragment" />
+        tools:context=".Presentation.DetailsModule.DetailsFragment" />
 
     <TextView
         android:id="@+id/tv_distancia"

@@ -4,17 +4,17 @@ import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
-import com.example.grainchainmap.placeholder.Route
+import com.example.grainchainmap.domain.entities.RutaEntity
 
 @Dao
 interface RouteDao {
 
     @Query("SELECT * FROM RouteEntity")
-    fun getAllRoutes():MutableList<Route>
+    fun getAllRoutes():MutableList<RutaEntity>
 
     @Insert
-    fun addRoute(routeEntity: Route)
+    fun addRoute(routeEntity: RutaEntity)
 
     @Delete
-    fun deleteroute(routeEntity: Route)
+    fun deleteroute(routeEntity: RutaEntity)
 }

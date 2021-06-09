@@ -1,4 +1,4 @@
-package com.example.grainchainmap
+package com.example.grainchainmap.Presentation.MapsModule
 
 import androidx.fragment.app.Fragment
 
@@ -13,8 +13,10 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.input.input
+import com.example.grainchainmap.GrainChainMapApplication
+import com.example.grainchainmap.R
 import com.example.grainchainmap.databinding.FragmentMapBinding
-import com.example.grainchainmap.placeholder.Route
+import com.example.grainchainmap.domain.entities.RutaEntity
 import com.example.grainchainmap.utils.Permissions
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.OnMapReadyCallback
@@ -86,7 +88,7 @@ class MapFragment : Fragment(), MyRouteRecyclerViewAdapter.RouteItemListener, Ea
             input(allowEmpty = true) { dialog, text ->
                 // Text submitted with the action button, might be an empty string`
 
-//                val esta = Route(7, "Ruta Casa de Goyis", 2.7f, "00:30" , arrayListOf( LatLngData(20.340957872197734, -102.03038005241035), LatLngData(20.380957872197734, -102.00038005241035) ))
+//                val esta = RutaEntity(7, "Ruta Casa de Goyis", 2.7f, "00:30" , arrayListOf( LatLngData(20.340957872197734, -102.03038005241035), LatLngData(20.380957872197734, -102.00038005241035) ))
 //
 //                Thread {
 //                    GrainChainMapApplication.database.routeDao().addRoute(esta)
@@ -116,12 +118,12 @@ class MapFragment : Fragment(), MyRouteRecyclerViewAdapter.RouteItemListener, Ea
 //        return list
 //    }
 
-//    fun provData() : ArrayList<Route>{
-//        var myList = arrayListOf<Route>()
+//    fun provData() : ArrayList<RutaEntity>{
+//        var myList = arrayListOf<RutaEntity>()
 //
-//        myList.add(Route(1, "Ruta Casa de Llamitas", 6.6f,"06:09" ,arrayListOf( LatLngData(20.361620999888242 ,-102.01978700011176), LatLngData(20.406620998882413 ,-101.97478700111759) ) ))
-//        myList.add(Route(2, "Ruta Casa de Alma", 0.9f,"00:45" , arrayListOf( LatLngData(20.353564716826344, -102.03763838137967), LatLngData(20.393564716826344, -102.00763838137967) ) ))
-//        myList.add(Route(7, "Ruta Casa de Goyis", 2.7f, "00:30" , arrayListOf( LatLngData(20.340957872197734, -102.03038005241035), LatLngData(20.380957872197734, -102.00038005241035) )))
+//        myList.add(RutaEntity(1, "Ruta Casa de Llamitas", 6.6f,"06:09" ,arrayListOf( LatLngData(20.361620999888242 ,-102.01978700011176), LatLngData(20.406620998882413 ,-101.97478700111759) ) ))
+//        myList.add(RutaEntity(2, "Ruta Casa de Alma", 0.9f,"00:45" , arrayListOf( LatLngData(20.353564716826344, -102.03763838137967), LatLngData(20.393564716826344, -102.00763838137967) ) ))
+//        myList.add(RutaEntity(7, "Ruta Casa de Goyis", 2.7f, "00:30" , arrayListOf( LatLngData(20.340957872197734, -102.03038005241035), LatLngData(20.380957872197734, -102.00038005241035) )))
 //
 //        return myList
 //    }
@@ -140,7 +142,7 @@ class MapFragment : Fragment(), MyRouteRecyclerViewAdapter.RouteItemListener, Ea
         }
     }
 
-    override fun onclickRouteItem(v: View, route: Route) {
+    override fun onclickRouteItem(v: View, route: RutaEntity) {
         //Toast.makeText(requireContext(), "${route.name} son ${route.km}", Toast.LENGTH_SHORT).show()
         val action = MapFragmentDirections.actionMapFragmentToDetailsFragment(route)
         findNavController().navigate(action)

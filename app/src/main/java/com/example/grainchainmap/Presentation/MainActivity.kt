@@ -1,10 +1,11 @@
-package com.example.grainchainmap
+package com.example.grainchainmap.Presentation
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import androidx.navigation.NavController
 import androidx.navigation.Navigation
 import androidx.navigation.ui.NavigationUI
+import com.example.grainchainmap.R
 import com.example.grainchainmap.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {

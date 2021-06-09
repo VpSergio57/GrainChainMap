@@ -1,4 +1,4 @@
-package com.example.grainchainmap
+package com.example.grainchainmap.Presentation.MapsModule
 
 import android.content.Context
 import androidx.recyclerview.widget.RecyclerView
@@ -8,7 +8,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 
 import com.example.grainchainmap.databinding.FragmentItemRouteBinding
-import com.example.grainchainmap.placeholder.Route
+import com.example.grainchainmap.domain.entities.RutaEntity
 import java.util.*
 
 /**
@@ -19,13 +19,13 @@ class MyRouteRecyclerViewAdapter( private val listener: RouteItemListener
 ) : RecyclerView.Adapter<MyRouteRecyclerViewAdapter.ViewHolder>() {
 
     interface RouteItemListener{
-        fun onclickRouteItem(v:View, route: Route)
+        fun onclickRouteItem(v:View, route: RutaEntity)
     }
 
-    private val routes = mutableListOf<Route>()
+    private val routes = mutableListOf<RutaEntity>()
     private lateinit var context: Context
 
-    fun addRoutes( myRoutes: MutableList<Route>){
+    fun addRoutes( myRoutes: MutableList<RutaEntity>){
         this.routes.addAll(myRoutes)
         notifyDataSetChanged()
     }
@@ -48,9 +48,9 @@ class MyRouteRecyclerViewAdapter( private val listener: RouteItemListener
     override fun onBindViewHolder(holder: ViewHolder, position: Int) = holder.bind(routes[position])
     override fun getItemCount(): Int = routes.size
 
-    inner class ViewHolder(binding: FragmentItemRouteBinding, private val listener:MyRouteRecyclerViewAdapter.RouteItemListener) : RecyclerView.ViewHolder(binding.root),
+    inner class ViewHolder(binding: FragmentItemRouteBinding, private val listener: RouteItemListener) : RecyclerView.ViewHolder(binding.root),
         View.OnClickListener {
-        private  lateinit var route: Route
+        private  lateinit var route: RutaEntity
         val tvKm: TextView = binding.tvKm
         val tvRouteName: TextView = binding.tvRouteName
 
@@ -58,7 +58,7 @@ class MyRouteRecyclerViewAdapter( private val listener: RouteItemListener
             binding.root.setOnClickListener(this)
         }
 
-        fun bind(route: Route){
+        fun bind(route: RutaEntity){
             this.route = route
             tvKm.text = "${route.km} Km"
             tvRouteName.text = route.name

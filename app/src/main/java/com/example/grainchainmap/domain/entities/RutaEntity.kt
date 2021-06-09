@@ -1,4 +1,5 @@
-package com.example.grainchainmap.placeholder
+package com.example.grainchainmap.domain.entities
+
 
 import android.os.Parcelable
 import androidx.room.Entity
@@ -9,7 +10,7 @@ import kotlinx.parcelize.Parcelize
 
 @Parcelize
 @Entity( tableName = "RouteEntity" )
-data class Route(
+data class RutaEntity(
     @PrimaryKey(autoGenerate = true) var id:Int = 0,
     var name:String = "",
     var km:Float = 0f,
