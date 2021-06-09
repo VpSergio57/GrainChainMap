@@ -25,7 +25,7 @@
             app:popUpTo="@id/mapFragment"
             app:popUpToInclusive="true" />
         <argument
-            android:name="route_name"
-            app:argType="string" />
+            android:name="currentRoute"
+            app:argType="com.example.grainchainmap.placeholder.Route" />
     </fragment>
 </navigation>

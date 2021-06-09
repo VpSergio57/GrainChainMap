@@ -13,7 +13,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.grainchainmap.databinding.FragmentMapBinding
 import com.example.grainchainmap.placeholder.LatLngData
-import com.example.grainchainmap.placeholder.Route
+import com.example.grainchainmap.placeholder.RouteEntity
 import com.example.grainchainmap.utils.Permissions
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.OnMapReadyCallback
@@ -32,15 +32,7 @@ class MapFragment : Fragment(), MyRouteRecyclerViewAdapter.RouteItemListener, Ea
     private var columnCount = 1
 
     private val callback = OnMapReadyCallback { googleMap ->
-        /**
-         * Manipulates the map once available.
-         * This callback is triggered when the map is ready to be used.
-         * This is where we can add markers or lines, add listeners or move the camera.
-         * In this case, we just add a marker near Sydney, Australia.
-         * If Google Play services is not installed on the device, the user will be prompted to
-         * install it inside the SupportMapFragment. This method will only be triggered once the
-         * user has installed Google Play services and returned to the app.
-         */
+
         val sydney = LatLng(20.35662107969063, -102.02478747217472)
         googleMap.addMarker(MarkerOptions().position(sydney).title("Marker in Sydney"))
         googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(sydney,16.5f))
@@ -69,23 +61,22 @@ class MapFragment : Fragment(), MyRouteRecyclerViewAdapter.RouteItemListener, Ea
         myAdapter.addRoutes( provData() )
 
         binding.stopStartBtn.setOnClickListener {
-            val action = MapFragmentDirections.actionMapFragmentToDetailsFragment("HOLA SECOND FRAGMENT")
-            findNavController().navigate(action)
+            //Start and Stop services
         }
 
         return binding.root
     }
 
-    fun provData() : ArrayList<Route>{
-        var myList = arrayListOf<Route>()
+    fun provData() : ArrayList<RouteEntity>{
+        var myList = arrayListOf<RouteEntity>()
 
-        myList.add(Route(1, "Ruta del amor", 6.6f, arrayListOf( LatLngData(0.1, 1.1)) ))
-        myList.add(Route(2, "Ruta del 69", 0.9f, arrayListOf( LatLngData(0.1, 1.1)) ))
-        myList.add(Route(3, "Ruta Cerro Grande", 14.9f, arrayListOf( LatLngData(0.1, 1.1)) ))
-        myList.add(Route(4, "Ruta Casa de Goyis", 18.3f, arrayListOf( LatLngData(0.1, 1.1)) ))
-        myList.add(Route(5, "Ruta Casa Llamitas", 1.9f, arrayListOf( LatLngData(0.1, 1.1)) ))
-        myList.add(Route(6, "Ruta Rio Grande", 9.8f, arrayListOf( LatLngData(0.1, 1.1)) ))
-        myList.add(Route(7, "Ruta Casa de Alma", 2.7f, arrayListOf( LatLngData(0.1, 1.1)) ))
+        myList.add(RouteEntity(1, "Ruta del amor", 6.6f,"06:09" , arrayListOf( LatLngData(0.1, 1.1)) ))
+        myList.add(RouteEntity(2, "Ruta del 69", 0.9f,"00:45" , arrayListOf( LatLngData(0.1, 1.1)) ))
+        myList.add(RouteEntity(3, "Ruta Cerro Grande", 14.9f,"01:25" , arrayListOf( LatLngData(0.1, 1.1)) ))
+        myList.add(RouteEntity(4, "Ruta Casa de Goyis", 18.3f,"02:35" , arrayListOf( LatLngData(0.1, 1.1)) ))
+        myList.add(RouteEntity(5, "Ruta Casa Llamitas", 1.9f,"00:15" , arrayListOf( LatLngData(0.1, 1.1)) ))
+        myList.add(RouteEntity(6, "Ruta Rio Grande", 9.8f, "00:10" ,arrayListOf( LatLngData(0.1, 1.1)) ))
+        myList.add(RouteEntity(7, "Ruta Casa de Alma", 2.7f, "00:30" ,arrayListOf( LatLngData(0.1, 1.1)) ))
 
         return myList
     }
@@ -104,8 +95,10 @@ class MapFragment : Fragment(), MyRouteRecyclerViewAdapter.RouteItemListener, Ea
         mapFragment?.getMapAsync(callback)
     }
 
-    override fun onclickRouteItem(v: View, route: Route) {
-        Toast.makeText(requireContext(), "${route.name} son ${route.km}", Toast.LENGTH_SHORT).show()
+    override fun onclickRouteItem(v: View, route: RouteEntity) {
+        //Toast.makeText(requireContext(), "${route.name} son ${route.km}", Toast.LENGTH_SHORT).show()
+        val action = MapFragmentDirections.actionMapFragmentToDetailsFragment(route)
+        findNavController().navigate(action)
     }
 
     override fun onRequestPermissionsResult(
