@@ -1,14 +1,15 @@
 package com.example.grainchainmap.utils
 
 import androidx.room.TypeConverter
-import com.example.grainchainmap.placeholder.Route
+import com.example.grainchainmap.domain.LatLngData
 import com.google.gson.Gson
 
 class Converters {
 
     @TypeConverter
-    fun arraylistToJson(value: ArrayList<Route>?) = Gson().toJson(value)
+    fun jsonToArraylisy(value: String): List<LatLngData> = Gson().fromJson( value, Array<LatLngData>::class.java).toList()
 
     @TypeConverter
-    fun jsonToArraylisy(value: String) = Gson().fromJson( value, Array<Route>::class.java).toList()
+    fun arraylistToJson(value: MutableList<LatLngData>?) = Gson().toJson(value)
+
 }

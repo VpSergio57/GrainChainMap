@@ -2,6 +2,7 @@ package com.example.grainchainmap
 
 import android.app.Application
 import androidx.room.Room
+import com.example.grainchainmap.data.db.GrainChainMapDatabase
 
 class GrainChainMapApplication:Application() {
 

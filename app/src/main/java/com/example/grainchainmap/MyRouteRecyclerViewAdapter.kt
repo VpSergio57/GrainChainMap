@@ -19,13 +19,13 @@ class MyRouteRecyclerViewAdapter( private val listener: RouteItemListener
 ) : RecyclerView.Adapter<MyRouteRecyclerViewAdapter.ViewHolder>() {
 
     interface RouteItemListener{
-        fun onclickRouteItem(v:View, route:Route)
+        fun onclickRouteItem(v:View, route: Route)
     }
 
     private val routes = mutableListOf<Route>()
     private lateinit var context: Context
 
-    fun addRoutes( myRoutes: ArrayList<Route>){
+    fun addRoutes( myRoutes: MutableList<Route>){
         this.routes.addAll(myRoutes)
         notifyDataSetChanged()
     }

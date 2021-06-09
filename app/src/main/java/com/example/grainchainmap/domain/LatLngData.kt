@@ -1,4 +1,4 @@
-package com.example.grainchainmap.placeholder
+package com.example.grainchainmap.domain
 
 import android.os.Parcelable
 import kotlinx.parcelize.Parcelize

@@ -3,7 +3,6 @@ package com.example.grainchainmap
 import androidx.fragment.app.Fragment
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -12,8 +11,9 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.afollestad.materialdialogs.MaterialDialog
+import com.afollestad.materialdialogs.input.input
 import com.example.grainchainmap.databinding.FragmentMapBinding
-import com.example.grainchainmap.placeholder.LatLngData
 import com.example.grainchainmap.placeholder.Route
 import com.example.grainchainmap.utils.Permissions
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -23,6 +23,9 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import com.vmadalin.easypermissions.EasyPermissions
 import com.vmadalin.easypermissions.dialogs.SettingsDialog
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class MapFragment : Fragment(), MyRouteRecyclerViewAdapter.RouteItemListener, EasyPermissions.PermissionCallbacks  {
 
@@ -59,50 +62,73 @@ class MapFragment : Fragment(), MyRouteRecyclerViewAdapter.RouteItemListener, Ea
             }
         }
 
-        myAdapter.addRoutes( provData() )
+        //myAdapter.addRoutes( provData() )
 
         binding.stopStartBtn.setOnClickListener {
-            //Start and Stop services
+            saveProcess()//Deberia de ir en el MVVM
         }
 
-        for(coor in tempRouteGenerator()){
-            Log.d("CO", "Lat:${coor.latitude} Long:${coor.longitude}")
-        }
+        getRutesFromRoom()
 
         return binding.root
     }
 
-    fun tempRouteGenerator():ArrayList<LatLngData>{
-        var list= arrayListOf<LatLngData>()
-        var tempLat = 20.356621
-        var temoLong = -102.024787
-        var coorInit = LatLngData(tempLat, temoLong)
-
-        list.add(coorInit)
-
-        for(i in 1..10){
-
-            tempLat += 0.005f
-            temoLong += 0.005f
-            list.add( LatLngData(tempLat, temoLong))
+    private fun getRutesFromRoom(){
+        CoroutineScope(Dispatchers.IO).launch{
+            val routes = GrainChainMapApplication.database.routeDao().getAllRoutes()
+            myAdapter.addRoutes( routes )
         }
-
-
-        return list
     }
 
-    fun provData() : ArrayList<Route>{
-        var myList = arrayListOf<Route>()
+    private fun saveProcess() {
+        MaterialDialog(requireContext()).show {
+            message(R.string.alert_add_route_messaje)
+            input(allowEmpty = true) { dialog, text ->
+                // Text submitted with the action button, might be an empty string`
 
-        myList.add(Route(1, "Ruta del amor", 6.6f,"06:09" , "" ))
-        myList.add(Route(2, "Ruta del 69", 0.9f,"00:45" , "" ))
-        myList.add(Route(3, "Ruta Cerro Grande", 14.9f,"01:25" , ""))
-        myList.add(Route(4, "Ruta Casa de Goyis", 18.3f,"02:35" , "" ))
-        myList.add(Route(5, "Ruta Casa Llamitas", 1.9f,"00:15" , "" ))
-        myList.add(Route(6, "Ruta Rio Grande", 9.8f, "00:10" , ""))
-        myList.add(Route(7, "Ruta Casa de Alma", 2.7f, "00:30" , "" ))
+//                val esta = Route(7, "Ruta Casa de Goyis", 2.7f, "00:30" , arrayListOf( LatLngData(20.340957872197734, -102.03038005241035), LatLngData(20.380957872197734, -102.00038005241035) ))
+//
+//                Thread {
+//                    GrainChainMapApplication.database.routeDao().addRoute(esta)
+//                }.start()
 
-        return myList
+            }
+            positiveButton(R.string.alerts_save)
+            negativeButton(R.string.alerts_discard)
+        }
+    }
+
+
+//    fun tempRouteGenerator():ArrayList<LatLngData>{
+//        var list= arrayListOf<LatLngData>()
+//        var tempLat = 20.356621
+//        var temoLong = -102.024787
+//        var coorInit = LatLngData(tempLat, temoLong)
+//
+//        list.add(coorInit)
+//
+//        for(i in 1..10){
+//
+//            tempLat += 0.005f
+//            temoLong += 0.005f
+//            list.add( LatLngData(tempLat, temoLong))
+//        }
+//        return list
+//    }
+
+//    fun provData() : ArrayList<Route>{
+//        var myList = arrayListOf<Route>()
+//
+//        myList.add(Route(1, "Ruta Casa de Llamitas", 6.6f,"06:09" ,arrayListOf( LatLngData(20.361620999888242 ,-102.01978700011176), LatLngData(20.406620998882413 ,-101.97478700111759) ) ))
+//        myList.add(Route(2, "Ruta Casa de Alma", 0.9f,"00:45" , arrayListOf( LatLngData(20.353564716826344, -102.03763838137967), LatLngData(20.393564716826344, -102.00763838137967) ) ))
+//        myList.add(Route(7, "Ruta Casa de Goyis", 2.7f, "00:30" , arrayListOf( LatLngData(20.340957872197734, -102.03038005241035), LatLngData(20.380957872197734, -102.00038005241035) )))
+//
+//        return myList
+//    }
+
+    private fun startMapLocation(){
+        val mapFragment = childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment?
+        mapFragment?.getMapAsync(callback)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -112,11 +138,6 @@ class MapFragment : Fragment(), MyRouteRecyclerViewAdapter.RouteItemListener, Ea
         }else{
             Permissions.requestLocationPermission(this)
         }
-    }
-
-    private fun startMapLocation(){
-        val mapFragment = childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment?
-        mapFragment?.getMapAsync(callback)
     }
 
     override fun onclickRouteItem(v: View, route: Route) {
