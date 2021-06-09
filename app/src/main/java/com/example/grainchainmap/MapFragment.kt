@@ -3,6 +3,7 @@ package com.example.grainchainmap
 import androidx.fragment.app.Fragment
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -64,19 +65,42 @@ class MapFragment : Fragment(), MyRouteRecyclerViewAdapter.RouteItemListener, Ea
             //Start and Stop services
         }
 
+        for(coor in tempRouteGenerator()){
+            Log.d("CO", "Lat:${coor.latitude} Long:${coor.longitude}")
+        }
+
         return binding.root
+    }
+
+    fun tempRouteGenerator():ArrayList<LatLngData>{
+        var list= arrayListOf<LatLngData>()
+        var tempLat = 20.356621
+        var temoLong = -102.024787
+        var coorInit = LatLngData(tempLat, temoLong)
+
+        list.add(coorInit)
+
+        for(i in 1..10){
+
+            tempLat += 0.005f
+            temoLong += 0.005f
+            list.add( LatLngData(tempLat, temoLong))
+        }
+
+
+        return list
     }
 
     fun provData() : ArrayList<RouteEntity>{
         var myList = arrayListOf<RouteEntity>()
 
-        myList.add(RouteEntity(1, "Ruta del amor", 6.6f,"06:09" , arrayListOf( LatLngData(0.1, 1.1)) ))
-        myList.add(RouteEntity(2, "Ruta del 69", 0.9f,"00:45" , arrayListOf( LatLngData(0.1, 1.1)) ))
-        myList.add(RouteEntity(3, "Ruta Cerro Grande", 14.9f,"01:25" , arrayListOf( LatLngData(0.1, 1.1)) ))
-        myList.add(RouteEntity(4, "Ruta Casa de Goyis", 18.3f,"02:35" , arrayListOf( LatLngData(0.1, 1.1)) ))
-        myList.add(RouteEntity(5, "Ruta Casa Llamitas", 1.9f,"00:15" , arrayListOf( LatLngData(0.1, 1.1)) ))
-        myList.add(RouteEntity(6, "Ruta Rio Grande", 9.8f, "00:10" ,arrayListOf( LatLngData(0.1, 1.1)) ))
-        myList.add(RouteEntity(7, "Ruta Casa de Alma", 2.7f, "00:30" ,arrayListOf( LatLngData(0.1, 1.1)) ))
+        myList.add(RouteEntity(1, "Ruta del amor", 6.6f,"06:09" , "" ))
+        myList.add(RouteEntity(2, "Ruta del 69", 0.9f,"00:45" , "" ))
+        myList.add(RouteEntity(3, "Ruta Cerro Grande", 14.9f,"01:25" , ""))
+        myList.add(RouteEntity(4, "Ruta Casa de Goyis", 18.3f,"02:35" , "" ))
+        myList.add(RouteEntity(5, "Ruta Casa Llamitas", 1.9f,"00:15" , "" ))
+        myList.add(RouteEntity(6, "Ruta Rio Grande", 9.8f, "00:10" , ""))
+        myList.add(RouteEntity(7, "Ruta Casa de Alma", 2.7f, "00:30" , "" ))
 
         return myList
     }

@@ -13,5 +13,5 @@ data class RouteEntity(
     var name:String = "",
     var km:Float = 0f,
     var time: String = "", //Aun no se si se calcular'a despues y no por la api
-    var latlong: ArrayList<LatLngData> = arrayListOf()
+    var latlongList: String
 ): Parcelable
