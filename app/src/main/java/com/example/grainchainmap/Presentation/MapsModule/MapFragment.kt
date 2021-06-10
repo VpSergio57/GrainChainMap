@@ -36,10 +36,7 @@ import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
-import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.MarkerOptions
-import com.google.android.gms.maps.model.PolygonOptions
-import com.google.android.gms.maps.model.PolylineOptions
+import com.google.android.gms.maps.model.*
 import com.vmadalin.easypermissions.EasyPermissions
 import com.vmadalin.easypermissions.dialogs.SettingsDialog
 
@@ -115,7 +112,6 @@ class MapFragment : Fragment(), MyRouteRecyclerViewAdapter.RouteItemListener, Ea
 
     private fun suscribeToObservers(){
         viewModel.observableRoutes().observe(viewLifecycleOwner, Observer {
-            cleanScreen()
             myAdapter.reloadRoutes(it)
         })
 
@@ -142,6 +138,7 @@ class MapFragment : Fragment(), MyRouteRecyclerViewAdapter.RouteItemListener, Ea
             saveProcess(pathPoint)
         }
         else{
+            cleanScreen()
             sendComandtoService(ACTION_START_OR_RESUME_SERVICE)
         }
     }
@@ -157,6 +154,22 @@ class MapFragment : Fragment(), MyRouteRecyclerViewAdapter.RouteItemListener, Ea
             binding.stopStartBtn.backgroundTintList = AppCompatResources.getColorStateList(requireContext(), R.color.green_500)
         }
     }
+
+//    private fun zoomToSeeWholeTrack(){
+//        val bounds = LatLngBounds.Builder()
+//        for(pos in pathPoint){
+//            bounds.include(pos)
+//        }
+//
+//        map?.moveCamera(
+//            CameraUpdateFactory.newLatLngBounds(
+//                bounds.build(),
+//                binding.mainLayout.width,
+//                binding.mainLayout.height,
+//                (binding.mainLayout.height * 0.05f).toInt()
+//            )
+//        )
+//    }
 
     private fun moveCamera(){
         if(pathPoint.isNotEmpty()){
@@ -192,7 +205,22 @@ class MapFragment : Fragment(), MyRouteRecyclerViewAdapter.RouteItemListener, Ea
         MaterialDialog(requireContext()).show {
             message(R.string.alert_add_route_messaje)
             input(allowEmpty = false) { dialog, text ->
-                viewModel.addRoute(RutaEntity(name = text.toString(), km = 26.0f, time = Helpers.getFoormatteStopWachTime(curTimeInMillis) , latlongList = locations))
+
+                if(locations.isNotEmpty()) {
+                    //zoomToSeeWholeTrack()
+                    viewModel.addRoute(
+                        RutaEntity(
+                            name = text.toString(),
+                            km = 26.0f,
+                            time = Helpers.getFoormatteStopWachTime(curTimeInMillis),
+                            latlongList = locations
+                        )
+                    )
+                }
+                else{
+                    Toast.makeText(requireContext(), getString(R.string.messahe_nolocations), Toast.LENGTH_LONG).show()
+                }
+
             }
             negativeButton {
                 cleanScreen()

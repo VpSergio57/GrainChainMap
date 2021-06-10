@@ -2,6 +2,7 @@ package com.example.grainchainmap.Presentation.DetailsModule
 
 import android.app.AlertDialog
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -12,11 +13,15 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.example.grainchainmap.R
 import com.example.grainchainmap.databinding.FragmentDetailsBinding
+import com.example.grainchainmap.domain.entities.RutaEntity
+import com.example.grainchainmap.utils.Constants
 import com.google.android.gms.maps.CameraUpdateFactory
+import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
+import com.google.android.gms.maps.model.PolylineOptions
 import dmax.dialog.SpotsDialog
 
 class DetailsFragment : Fragment() {
@@ -26,22 +31,26 @@ class DetailsFragment : Fragment() {
     private val binding get() = _binding!!
     private lateinit var viewModel: DetailsViewMovel
     private lateinit var dialog: AlertDialog
+    private lateinit var map: GoogleMap
+    private lateinit var route: RutaEntity
     private val args by navArgs<DetailsFragmentArgs>()
 
     private val callback = OnMapReadyCallback { googleMap ->
-
+        map = googleMap
         val sydney = LatLng(20.35662107969063, -102.02478747217472)
-        googleMap.addMarker(MarkerOptions().position(sydney).title("Marker in Sydney"))
-        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(sydney,16.5f))
+
+        addPolyline(route.latlongList)
+
+        //googleMap.addMarker(MarkerOptions().position(sydney).title("Marker in Sydney"))
+        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom( route.latlongList[0],15.0f))
     }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-
         _binding = FragmentDetailsBinding.inflate(inflater, container, false)
-        val route = args.currentRoute
+        route = args.currentRoute
 
         dialog = SpotsDialog.Builder().setContext(context)
             .setCancelable(false)
@@ -76,6 +85,23 @@ class DetailsFragment : Fragment() {
                 findNavController().navigateUp()
             }
         })
+    }
+
+    private fun addPolyline(points: MutableList<LatLng>){
+        if(points.isNotEmpty() && points.size>1){
+
+            for(i in 1 until points.size){
+                Log.d("DETAILS", "${points[i-1]} , ${points[i]}")
+                val preLastLasLong = points[i-1]
+                val lstLasLong = points[i]
+                val polylineOptions = PolylineOptions()
+                    .color(R.color.red_500)
+                    .width(Constants.POLYLINE_WIDTH)
+                    .add(preLastLasLong)
+                    .add(lstLasLong)
+                map?.addPolyline(polylineOptions)
+            }
+        }
     }
 
     override fun onDestroyView() {
