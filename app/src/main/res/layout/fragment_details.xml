@@ -23,22 +23,22 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="30dp"
-        tools:text="TextView"
         android:textAlignment="center"
         app:layout_constraintEnd_toEndOf="@+id/map"
         app:layout_constraintStart_toStartOf="@+id/map"
-        app:layout_constraintTop_toBottomOf="@+id/map" />
+        app:layout_constraintTop_toBottomOf="@+id/map"
+        tools:text="TextView" />
 
     <TextView
         android:id="@+id/tv_tiempo"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="15dp"
-        tools:text="TextView"
         android:textAlignment="center"
         app:layout_constraintEnd_toEndOf="@+id/tv_distancia"
         app:layout_constraintStart_toStartOf="@+id/tv_distancia"
-        app:layout_constraintTop_toBottomOf="@+id/tv_distancia" />
+        app:layout_constraintTop_toBottomOf="@+id/tv_distancia"
+        tools:text="TextView" />
 
     <ImageButton
         android:id="@+id/btn_share"
@@ -61,6 +61,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
+
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline2"

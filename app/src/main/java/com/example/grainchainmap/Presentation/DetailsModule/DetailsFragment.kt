@@ -1,5 +1,6 @@
 package com.example.grainchainmap.Presentation.DetailsModule
 
+import android.app.AlertDialog
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -9,7 +10,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
-import androidx.navigation.ui.navigateUp
 import com.example.grainchainmap.R
 import com.example.grainchainmap.databinding.FragmentDetailsBinding
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -17,6 +17,7 @@ import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
+import dmax.dialog.SpotsDialog
 
 class DetailsFragment : Fragment() {
 //
@@ -24,7 +25,7 @@ class DetailsFragment : Fragment() {
     private var _binding:FragmentDetailsBinding? = null
     private val binding get() = _binding!!
     private lateinit var viewModel: DetailsViewMovel
-
+    private lateinit var dialog: AlertDialog
     private val args by navArgs<DetailsFragmentArgs>()
 
     private val callback = OnMapReadyCallback { googleMap ->
@@ -42,6 +43,10 @@ class DetailsFragment : Fragment() {
         _binding = FragmentDetailsBinding.inflate(inflater, container, false)
         val route = args.currentRoute
 
+        dialog = SpotsDialog.Builder().setContext(context)
+            .setCancelable(false)
+            .build()
+
         (requireActivity() as AppCompatActivity).supportActionBar?.title = route.name
         // Inflate the layout for this fragment
 
@@ -53,7 +58,10 @@ class DetailsFragment : Fragment() {
 
         binding.tvDeleteRoute.setOnClickListener {
             viewModel.deleteRoute(route)
+            dialog.show()
+
         }
+
 
 
         return binding.root
@@ -64,6 +72,7 @@ class DetailsFragment : Fragment() {
         viewModel = ViewModelProvider(this).get(DetailsViewMovel::class.java)
         viewModel.observableOnDeleteRoute().observe(viewLifecycleOwner, {
             if(it){
+                dialog.dismiss()
                 findNavController().navigateUp()
             }
         })

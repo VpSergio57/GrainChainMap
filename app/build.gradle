@@ -66,6 +66,7 @@ dependencies {
     implementation 'com.google.code.gson:gson:2.8.7'
     //Input Dialogs
     implementation 'com.afollestad.material-dialogs:input:3.3.0'
+    implementation 'com.github.d-max:spots-dialog:1.1@aar'
     //Coroutines
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.4.1")
     //Lifecycle

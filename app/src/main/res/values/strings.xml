@@ -8,4 +8,5 @@
     <string name="alerts_save">Guardar</string>
     <string name="alerts_discard">Descartar</string>
     <string name="alert_add_route_messaje">Nombre de la Ruta</string>
+    <string name="loading">Loading...</string>
 </resources>
