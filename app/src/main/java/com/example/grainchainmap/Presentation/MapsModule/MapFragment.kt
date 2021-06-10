@@ -26,7 +26,6 @@ import com.example.grainchainmap.Presentation.services.TrackingService
 import com.example.grainchainmap.R
 import com.example.grainchainmap.databinding.FragmentMapBinding
 import com.example.grainchainmap.domain.entities.RutaEntity
-import com.example.grainchainmap.utils.Constants.ACTION_PAUSE_SERVICE
 import com.example.grainchainmap.utils.Constants.ACTION_START_OR_RESUME_SERVICE
 import com.example.grainchainmap.utils.Constants.ACTION_STOP_SERVICE
 import com.example.grainchainmap.utils.Constants.MAP_ZOOM

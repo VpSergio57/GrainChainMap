@@ -9,7 +9,6 @@ import android.os.Looper
 import android.util.Log
 import androidx.lifecycle.LifecycleService
 import androidx.lifecycle.MutableLiveData
-import com.example.grainchainmap.utils.Constants.ACTION_PAUSE_SERVICE
 import com.example.grainchainmap.utils.Constants.ACTION_STOP_SERVICE
 import com.example.grainchainmap.utils.Constants.FASTEST_LOCATION_INTERVAL
 import com.example.grainchainmap.utils.Constants.LOCATION_UPDATE_INTERVAL
@@ -24,7 +23,6 @@ import kotlinx.coroutines.launch
 
 class TrackingService: LifecycleService() {
 
-    private var isFirstRun = true
     private var serviceKilled = false
     lateinit var fusedLocationProviderClient: FusedLocationProviderClient
     private val timeRunInSeconds = MutableLiveData<Long>()
@@ -60,7 +58,6 @@ class TrackingService: LifecycleService() {
     private var lastSecondTimeStamp = 0L
 
     private fun startTimer(){
-        addEmptyPolyline()
         isTracking.postValue(true)
         timeStarted = System.currentTimeMillis()
         isTimerEnabled = true
@@ -80,46 +77,19 @@ class TrackingService: LifecycleService() {
         }
     }
 
-
-    private fun pauseService(){
-        isTracking.postValue(false)
-        isTimerEnabled = false
-    }
-
-    private fun killService(){
-        serviceKilled = true
-        isFirstRun = true
-        pauseService()
-        postInitialValues()
-        stopSelf()
-    }
-
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
 
         intent?.let{
             when(it.action){
                 ACTION_START_OR_RESUME_SERVICE ->{
-                    if(isFirstRun){
-                        startForegroundService()
-                        Log.d("SER_SERVICE","Started service")
-                    }else{
-                        startTimer()
-                        Log.d("SER_SERVICE","Resumed service")
-                    }
-
-                }
-                ACTION_PAUSE_SERVICE ->{
-                    pauseService()
-                    Log.d("SER_SERVICE","Paused service")
+                    startForegroundService()
+                    Log.d("SER_SERVICE","Started service")
                 }
                 ACTION_STOP_SERVICE ->{
                     killService()
                     Log.d("SER_SERVICE","Stopped Service")
                 }
-
-                else -> {
-
-                }
+                else -> { }
             }
         }
         return super.onStartCommand(intent, flags, startId)
@@ -128,6 +98,14 @@ class TrackingService: LifecycleService() {
     private fun startForegroundService(){
         startTimer()
         isTracking.postValue(true)
+    }
+
+    private fun killService(){
+        isTracking.postValue(false)
+        isTimerEnabled = false
+        serviceKilled = true
+        postInitialValues()
+        stopSelf()
     }
 
     @SuppressLint("MissingPermission")
@@ -146,7 +124,7 @@ class TrackingService: LifecycleService() {
         }
     }
 
-    val locationCallback = object: LocationCallback() {
+    private val locationCallback = object: LocationCallback() {
         override fun onLocationResult(result: LocationResult?) {
             super.onLocationResult(result)
             if(isTracking.value!!){
@@ -162,14 +140,11 @@ class TrackingService: LifecycleService() {
     private fun addPathPoint(location: Location?){
         location?.let {
             val pos = LatLng(location.latitude, location.longitude)
-
             pathPoint.value?.apply {
                 add(pos)
                 pathPoint.postValue(this)
             }
         }
     }
-
-    private fun addEmptyPolyline() = pathPoint.postValue(mutableListOf())
 
 }
