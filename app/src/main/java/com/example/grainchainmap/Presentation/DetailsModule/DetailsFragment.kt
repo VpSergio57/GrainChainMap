@@ -38,7 +38,7 @@ class DetailsFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
 
         _binding = FragmentDetailsBinding.inflate(inflater, container, false)
         val route = args.currentRoute

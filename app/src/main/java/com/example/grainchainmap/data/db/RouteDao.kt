@@ -13,8 +13,8 @@ interface RouteDao {
     fun getAllRoutes():MutableList<RutaEntity>
 
     @Insert
-    fun addRoute(routeEntity: RutaEntity): Long
+    fun addRoute(routeEntity: RutaEntity)
 
     @Delete
-    fun deleteRoute(routeEntity: RutaEntity): Int
+    fun deleteRoute(routeEntity: RutaEntity)
 }

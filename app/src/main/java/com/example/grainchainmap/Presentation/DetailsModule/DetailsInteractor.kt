@@ -11,14 +11,13 @@ import kotlinx.coroutines.withContext
 class DetailsInteractor {
 
 
-    val scope = CoroutineScope(Dispatchers.IO)
+    private val scope = CoroutineScope(Dispatchers.IO)
 
     fun deleteRouteToDB(route: RutaEntity, callback: (Boolean) -> Unit){
         scope.launch {
             GrainChainMapApplication.database.routeDao().deleteRoute(route)
-            withContext(Dispatchers.Main){
-                callback(true)
-            }
+            callback(true)
+
         }
     }
 

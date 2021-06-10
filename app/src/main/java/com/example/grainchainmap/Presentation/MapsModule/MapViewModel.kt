@@ -8,11 +8,11 @@ import com.example.grainchainmap.domain.entities.RutaEntity
 
 class MapViewModel:ViewModel() {
 
-    private var routesList: MutableList<RutaEntity>
+   // private var routesList: MutableList<RutaEntity>
     private var interactor:MapInteractor
 
     init{
-        routesList = mutableListOf()
+      //  routesList = mutableListOf()
         interactor = MapInteractor()
     }
 
@@ -24,7 +24,8 @@ class MapViewModel:ViewModel() {
 
     fun loadRoutes(){
         interactor.getRoutesFromDB {
-            routesList = it
+            //routesList = it
+            this.routes.postValue(mutableListOf())
             this.routes.postValue(it)
         }
     }
@@ -32,9 +33,11 @@ class MapViewModel:ViewModel() {
     fun addRoute(route:RutaEntity){
         interactor.addRouteToDB(route) {
             if(it){
-                routesList.add(route)
-                this.routes.postValue(mutableListOf())
-                this.routes.postValue(routesList)
+                loadRoutes()
+                //routesList.add(route)
+                ///this.routes.postValue(mutableListOf())
+
+                //this.routes.postValue(routesList)
             }
         }
     }

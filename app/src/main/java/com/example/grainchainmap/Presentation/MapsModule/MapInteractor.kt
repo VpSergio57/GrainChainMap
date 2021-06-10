@@ -22,9 +22,7 @@ class MapInteractor {
     fun addRouteToDB(route:RutaEntity, callback: (Boolean) -> Unit){
         scope.launch {
             GrainChainMapApplication.database.routeDao().addRoute(route)
-            withContext(Dispatchers.Main){
-                callback(true)
-            }
+            callback(true)
         }
     }
 
