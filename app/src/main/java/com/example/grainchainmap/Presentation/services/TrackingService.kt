@@ -24,8 +24,10 @@ import kotlinx.coroutines.launch
 class TrackingService: LifecycleService() {
 
     private var serviceKilled = false
-    lateinit var fusedLocationProviderClient: FusedLocationProviderClient
-    private val timeRunInSeconds = MutableLiveData<Long>()
+    private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
+    private var isTimerEnabled = false
+    private var timeRun = 0L
+    private var timeStarted = 0L
 
     companion object{
         val timeRunInMillis = MutableLiveData<Long>()
@@ -36,7 +38,6 @@ class TrackingService: LifecycleService() {
     private fun postInitialValues(){
         isTracking.postValue(false)
         pathPoint.postValue(mutableListOf())
-        timeRunInSeconds.postValue(0L)
         timeRunInMillis.postValue(0L)
     }
 
@@ -48,33 +49,6 @@ class TrackingService: LifecycleService() {
         isTracking.observe(this, {
             updateLocationTracking(it)
         })
-    }
-
-    private var isTimerEnabled = false
-    private var lapTime = 0L
-
-    private var timeRun = 0L
-    private var timeStarted = 0L
-    private var lastSecondTimeStamp = 0L
-
-    private fun startTimer(){
-        isTracking.postValue(true)
-        timeStarted = System.currentTimeMillis()
-        isTimerEnabled = true
-        CoroutineScope(Dispatchers.Main).launch {
-            while (isTracking.value!!){
-                //time diference betwen now and timestarted
-                lapTime = System.currentTimeMillis() - timeStarted
-                //post the new laptime
-                timeRunInMillis.postValue(timeRun + lapTime)
-                if(timeRunInMillis.value!! >= lastSecondTimeStamp + 1000L){
-                    timeRunInSeconds.postValue(timeRunInSeconds.value!! + 1)
-                    lastSecondTimeStamp += 1000L
-                }
-                delay(TIME_UDATE_INTERVAL)
-            }
-            timeRun += lapTime
-        }
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -97,6 +71,7 @@ class TrackingService: LifecycleService() {
 
     private fun startForegroundService(){
         startTimer()
+        postInitialValues()
         isTracking.postValue(true)
     }
 
@@ -104,7 +79,6 @@ class TrackingService: LifecycleService() {
         isTracking.postValue(false)
         isTimerEnabled = false
         serviceKilled = true
-        postInitialValues()
         stopSelf()
     }
 
@@ -137,6 +111,20 @@ class TrackingService: LifecycleService() {
             }
         }
     }
+
+    private fun startTimer(){
+        isTracking.postValue(true)
+        timeStarted = System.currentTimeMillis()
+        isTimerEnabled = true
+        CoroutineScope(Dispatchers.Main).launch {
+            while (isTracking.value!!){
+                timeRun = System.currentTimeMillis() - timeStarted
+                timeRunInMillis.postValue(timeRun)
+                delay(TIME_UDATE_INTERVAL)
+            }
+        }
+    }
+
     private fun addPathPoint(location: Location?){
         location?.let {
             val pos = LatLng(location.latitude, location.longitude)

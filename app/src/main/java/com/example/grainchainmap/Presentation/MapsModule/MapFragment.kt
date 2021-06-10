@@ -56,9 +56,9 @@ class MapFragment : Fragment(), MyRouteRecyclerViewAdapter.RouteItemListener, Ea
 
     private val callback = OnMapReadyCallback { googleMap ->
         map = googleMap
-
         val sydney = LatLng(20.35662107969063, -102.02478747217472)
-        googleMap.addMarker(MarkerOptions().position(sydney).title("Marker in Sydney"))
+        googleMap.isMyLocationEnabled = true
+       // googleMap.addMarker(MarkerOptions().position(sydney).title("Marker in Sydney"))
         googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(sydney,16.5f))
 
     }

@@ -17,6 +17,6 @@ object Constants {
     const val MAP_ZOOM = 16.5f
 
     //
-    const val TIME_UDATE_INTERVAL = 50L
+    const val TIME_UDATE_INTERVAL = 10L
 
 }
