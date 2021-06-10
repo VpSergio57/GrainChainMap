@@ -54,7 +54,7 @@ class DetailsFragment : Fragment() {
         mapFragment?.getMapAsync(callback)
 
         binding.tvDistancia.text = "${route.km} KM"
-        binding.tvTiempo.text = "${route.time} HRS"
+        binding.tvTiempo.text = route.time
 
         binding.tvDeleteRoute.setOnClickListener {
             viewModel.deleteRoute(route)

@@ -13,16 +13,24 @@ import com.example.grainchainmap.utils.Constants.ACTION_PAUSE_SERVICE
 import com.example.grainchainmap.utils.Constants.ACTION_STOP_SERVICE
 import com.example.grainchainmap.utils.Constants.FASTEST_LOCATION_INTERVAL
 import com.example.grainchainmap.utils.Constants.LOCATION_UPDATE_INTERVAL
+import com.example.grainchainmap.utils.Constants.TIME_UDATE_INTERVAL
 import com.example.grainchainmap.utils.Permissions
 import com.google.android.gms.location.*
 import com.google.android.gms.maps.model.LatLng
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 class TrackingService: LifecycleService() {
 
     private var isFirstRun = true
+    private var serviceKilled = false
     lateinit var fusedLocationProviderClient: FusedLocationProviderClient
+    private val timeRunInSeconds = MutableLiveData<Long>()
 
     companion object{
+        val timeRunInMillis = MutableLiveData<Long>()
         val isTracking = MutableLiveData<Boolean>()
         val pathPoint = MutableLiveData<MutableList<LatLng>>()
     }
@@ -30,6 +38,8 @@ class TrackingService: LifecycleService() {
     private fun postInitialValues(){
         isTracking.postValue(false)
         pathPoint.postValue(mutableListOf())
+        timeRunInSeconds.postValue(0L)
+        timeRunInMillis.postValue(0L)
     }
 
     override fun onCreate() {
@@ -40,13 +50,48 @@ class TrackingService: LifecycleService() {
         isTracking.observe(this, {
             updateLocationTracking(it)
         })
-
-
-
     }
+
+    private var isTimerEnabled = false
+    private var lapTime = 0L
+
+    private var timeRun = 0L
+    private var timeStarted = 0L
+    private var lastSecondTimeStamp = 0L
+
+    private fun startTimer(){
+        addEmptyPolyline()
+        isTracking.postValue(true)
+        timeStarted = System.currentTimeMillis()
+        isTimerEnabled = true
+        CoroutineScope(Dispatchers.Main).launch {
+            while (isTracking.value!!){
+                //time diference betwen now and timestarted
+                lapTime = System.currentTimeMillis() - timeStarted
+                //post the new laptime
+                timeRunInMillis.postValue(timeRun + lapTime)
+                if(timeRunInMillis.value!! >= lastSecondTimeStamp + 1000L){
+                    timeRunInSeconds.postValue(timeRunInSeconds.value!! + 1)
+                    lastSecondTimeStamp += 1000L
+                }
+                delay(TIME_UDATE_INTERVAL)
+            }
+            timeRun += lapTime
+        }
+    }
+
 
     private fun pauseService(){
         isTracking.postValue(false)
+        isTimerEnabled = false
+    }
+
+    private fun killService(){
+        serviceKilled = true
+        isFirstRun = true
+        pauseService()
+        postInitialValues()
+        stopSelf()
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -58,6 +103,7 @@ class TrackingService: LifecycleService() {
                         startForegroundService()
                         Log.d("SER_SERVICE","Started service")
                     }else{
+                        startTimer()
                         Log.d("SER_SERVICE","Resumed service")
                     }
 
@@ -67,6 +113,7 @@ class TrackingService: LifecycleService() {
                     Log.d("SER_SERVICE","Paused service")
                 }
                 ACTION_STOP_SERVICE ->{
+                    killService()
                     Log.d("SER_SERVICE","Stopped Service")
                 }
 
@@ -79,7 +126,7 @@ class TrackingService: LifecycleService() {
     }
 
     private fun startForegroundService(){
-        addEmptyPolyline()
+        startTimer()
         isTracking.postValue(true)
     }
 

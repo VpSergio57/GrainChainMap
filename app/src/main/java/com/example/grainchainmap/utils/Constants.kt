@@ -17,4 +17,7 @@ object Constants {
     const val POLYLINE_WIDTH = 8f
     const val MAP_ZOOM = 16.5f
 
+    //
+    const val TIME_UDATE_INTERVAL = 50L
+
 }

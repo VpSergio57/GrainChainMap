@@ -27,8 +27,10 @@ import com.example.grainchainmap.databinding.FragmentMapBinding
 import com.example.grainchainmap.domain.entities.RutaEntity
 import com.example.grainchainmap.utils.Constants.ACTION_PAUSE_SERVICE
 import com.example.grainchainmap.utils.Constants.ACTION_START_OR_RESUME_SERVICE
+import com.example.grainchainmap.utils.Constants.ACTION_STOP_SERVICE
 import com.example.grainchainmap.utils.Constants.MAP_ZOOM
 import com.example.grainchainmap.utils.Constants.POLYLINE_WIDTH
+import com.example.grainchainmap.utils.Helpers
 import com.example.grainchainmap.utils.Permissions
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
@@ -50,9 +52,9 @@ class MapFragment : Fragment(), MyRouteRecyclerViewAdapter.RouteItemListener, Ea
     private lateinit var viewModel: MapViewModel
     private lateinit var myAdapter: MyRouteRecyclerViewAdapter
     private var columnCount = 1
-    private var runBehavior = true
     private var isTracking = false
     private var pathPoint = mutableListOf<LatLng>()
+    private var curTimeInMillis = 0L
 
 
     private val callback = OnMapReadyCallback { googleMap ->
@@ -87,31 +89,36 @@ class MapFragment : Fragment(), MyRouteRecyclerViewAdapter.RouteItemListener, Ea
 
         binding.stopStartBtn.setOnClickListener {
             toggleRun()
-        //saveProcess()
         }
-
 
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
         viewModel = ViewModelProvider(this).get(MapViewModel::class.java)
-        viewModel.observableRoutes().observe(viewLifecycleOwner, Observer {
-            myAdapter.reloadRoutes(it)
-        })
-
-        viewModel.loadRoutes()
 
         if(Permissions.hasLocationPermission(requireContext())){
             startMapLocation()
+            viewModel.loadRoutes()
         } else{
             Permissions.requestLocationPermission(this)
         }
     }
 
+    private fun startMapLocation(){
+        suscribeToObservers()
+        val mapFragment = childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment?
+        mapFragment?.getMapAsync(callback)
+
+    }
+
     private fun suscribeToObservers(){
+        viewModel.observableRoutes().observe(viewLifecycleOwner, Observer {
+            cleanScreen()
+            myAdapter.reloadRoutes(it)
+        })
+
         TrackingService.isTracking.observe(viewLifecycleOwner, {
             updateTracking(it)
         })
@@ -121,11 +128,17 @@ class MapFragment : Fragment(), MyRouteRecyclerViewAdapter.RouteItemListener, Ea
             addLatestPolyline()
             moveCamera()
         })
+
+        TrackingService.timeRunInMillis.observe(viewLifecycleOwner, {
+            curTimeInMillis = it
+            val formattedTime = Helpers.getFoormatteStopWachTime(curTimeInMillis, true)
+            binding.tvTimeCount.text = formattedTime
+        })
     }
 
     private fun toggleRun(){
         if(isTracking){
-            sendComandtoService(ACTION_PAUSE_SERVICE)
+            sendComandtoService(ACTION_STOP_SERVICE)
             saveProcess(pathPoint)
         }
         else{
@@ -156,6 +169,11 @@ class MapFragment : Fragment(), MyRouteRecyclerViewAdapter.RouteItemListener, Ea
         }
     }
 
+    private fun cleanScreen(){
+        binding.tvTimeCount.text = getString(R.string.zeroTime)
+        map?.clear()
+    }
+
     private fun addLatestPolyline(){
         if(pathPoint.isNotEmpty() && pathPoint.size>1){
             val preLastLasLong = pathPoint[pathPoint.size - 2]
@@ -173,8 +191,11 @@ class MapFragment : Fragment(), MyRouteRecyclerViewAdapter.RouteItemListener, Ea
     private fun saveProcess(locations:MutableList<LatLng>) {
         MaterialDialog(requireContext()).show {
             message(R.string.alert_add_route_messaje)
-            input(allowEmpty = true) { dialog, text ->
-                viewModel.addRoute(RutaEntity(name = text.toString(), km = 26.0f, time = "08:09" , latlongList = locations))
+            input(allowEmpty = false) { dialog, text ->
+                viewModel.addRoute(RutaEntity(name = text.toString(), km = 26.0f, time = Helpers.getFoormatteStopWachTime(curTimeInMillis) , latlongList = locations))
+            }
+            negativeButton {
+                cleanScreen()
             }
             positiveButton(R.string.alerts_save)
             negativeButton(R.string.alerts_discard)
@@ -184,13 +205,6 @@ class MapFragment : Fragment(), MyRouteRecyclerViewAdapter.RouteItemListener, Ea
     private fun sendComandtoService(action:String) = Intent(requireContext(), TrackingService::class.java).also {
         it.action = action
         requireContext().startService(it)
-    }
-
-    private fun startMapLocation(){
-        suscribeToObservers()
-        val mapFragment = childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment?
-        mapFragment?.getMapAsync(callback)
-
     }
 
     override fun onclickRouteItem(v: View, route: RutaEntity) {
@@ -217,7 +231,7 @@ class MapFragment : Fragment(), MyRouteRecyclerViewAdapter.RouteItemListener, Ea
     }
 
     override fun onPermissionsGranted(requestCode: Int, perms: List<String>) {
-        Toast.makeText(requireContext(), "Permisos Aceptados!!", Toast.LENGTH_SHORT).show()
+        Toast.makeText(requireContext(), getString(R.string.permisos_ok), Toast.LENGTH_SHORT).show()
         startMapLocation()
     }
 
