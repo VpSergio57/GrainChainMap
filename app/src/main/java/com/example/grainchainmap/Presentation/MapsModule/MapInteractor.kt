@@ -28,14 +28,5 @@ class MapInteractor {
         }
     }
 
-    fun deleteRouteToDB(route:RutaEntity, callback: (Boolean) -> Unit){
-        scope.launch {
-            GrainChainMapApplication.database.routeDao().deleteRoute(route)
-            withContext(Dispatchers.Main){
-                callback(true)
-            }
-        }
-    }
-
 
 }

@@ -3,12 +3,7 @@ package com.example.grainchainmap.Presentation.MapsModule
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import com.example.grainchainmap.GrainChainMapApplication
 import com.example.grainchainmap.domain.entities.RutaEntity
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 
 class MapViewModel:ViewModel() {
@@ -21,11 +16,11 @@ class MapViewModel:ViewModel() {
         interactor = MapInteractor()
     }
 
-    fun observeRoutes():LiveData<MutableList<RutaEntity>> = routes
-
     private val routes: MutableLiveData<MutableList<RutaEntity>> by lazy {
         MutableLiveData<MutableList<RutaEntity>>()
     }
+
+    fun observableRoutes():LiveData<MutableList<RutaEntity>> = routes
 
     fun loadRoutes(){
         interactor.getRoutesFromDB {
@@ -44,16 +39,6 @@ class MapViewModel:ViewModel() {
         }
     }
 
-    fun deleteRoute(route:RutaEntity){
-        interactor.addRouteToDB(route) {
-            if(it){
-                routesList.remove(route)
-
-                this.routes.postValue(mutableListOf())
-                this.routes.postValue(routesList)
-            }
-        }
-    }
 
 
 }

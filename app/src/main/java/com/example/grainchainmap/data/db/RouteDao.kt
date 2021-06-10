@@ -16,5 +16,5 @@ interface RouteDao {
     fun addRoute(routeEntity: RutaEntity): Long
 
     @Delete
-    fun deleteRoute(routeEntity: RutaEntity): Long
+    fun deleteRoute(routeEntity: RutaEntity): Int
 }

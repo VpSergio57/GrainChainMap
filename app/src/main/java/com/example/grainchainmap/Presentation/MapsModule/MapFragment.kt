@@ -81,7 +81,7 @@ class MapFragment : Fragment(), MyRouteRecyclerViewAdapter.RouteItemListener, Ea
         super.onViewCreated(view, savedInstanceState)
 
         viewModel = ViewModelProvider(this).get(MapViewModel::class.java)
-        viewModel.observeRoutes().observe(viewLifecycleOwner, Observer {
+        viewModel.observableRoutes().observe(viewLifecycleOwner, Observer {
             myAdapter.reloadRoutes(it)
         })
 
