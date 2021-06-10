@@ -139,7 +139,7 @@ class MapFragment : Fragment(), MyRouteRecyclerViewAdapter.RouteItemListener, Ea
             saveProcess(pathPoint)
         }
         else{
-            cleanScreen()
+            cleanScreenAndValues()
             sendComandtoService(ACTION_START_OR_RESUME_SERVICE)
         }
     }
@@ -183,7 +183,8 @@ class MapFragment : Fragment(), MyRouteRecyclerViewAdapter.RouteItemListener, Ea
         }
     }
 
-    private fun cleanScreen(){
+    private fun cleanScreenAndValues(){
+        totalDistance = 0f
         binding.tvTimeCount.text = getString(R.string.zeroTime)
         map?.clear()
     }
@@ -223,11 +224,12 @@ class MapFragment : Fragment(), MyRouteRecyclerViewAdapter.RouteItemListener, Ea
                     viewModel.addRoute(
                         RutaEntity(
                             name = text.toString(),
-                            km = totalDistance,
+                            km = Helpers.convertMetersToKM(totalDistance),
                             time = Helpers.getFoormatteStopWachTime(curTimeInMillis),
                             latlongList = locations
                         )
                     )
+                    Toast.makeText( requireContext(), getString(R.string.message_save_route), Toast.LENGTH_LONG).show()
                 }
                 else{
                     Toast.makeText(requireContext(), getString(R.string.messahe_nolocations), Toast.LENGTH_LONG).show()
@@ -235,7 +237,7 @@ class MapFragment : Fragment(), MyRouteRecyclerViewAdapter.RouteItemListener, Ea
 
             }
             negativeButton {
-                cleanScreen()
+                //cleanScreen()
             }
             positiveButton(R.string.alerts_save)
             negativeButton(R.string.alerts_discard)

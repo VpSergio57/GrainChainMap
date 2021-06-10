@@ -12,4 +12,5 @@
     <string name="zeroTime">00:00:00:00</string>
     <string name="permisos_ok">Permisos Aceptados!!</string>
     <string name="messahe_nolocations">Debes caminar o correr para guardar una ruta</string>
+    <string name="message_save_route">Ruta guardada!!</string>
 </resources>

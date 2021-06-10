@@ -8,7 +8,7 @@
     <fragment
         android:id="@+id/mapFragment"
         android:name="com.example.grainchainmap.Presentation.MapsModule.MapFragment"
-        android:label="fragment_map"
+        android:label="Grain Chain Run"
         tools:layout="@layout/fragment_map" >
         <action
             android:id="@+id/action_mapFragment_to_detailsFragment"
@@ -17,7 +17,7 @@
     <fragment
         android:id="@+id/detailsFragment"
         android:name="com.example.grainchainmap.Presentation.DetailsModule.DetailsFragment"
-        android:label="fragment_details"
+        android:label=""
         tools:layout="@layout/fragment_details" >
         <action
             android:id="@+id/action_detailsFragment_to_mapFragment"

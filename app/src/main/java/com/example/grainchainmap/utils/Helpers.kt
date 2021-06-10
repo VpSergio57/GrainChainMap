@@ -1,5 +1,7 @@
 package com.example.grainchainmap.utils
 
+import java.math.BigDecimal
+import java.text.DecimalFormat
 import java.util.concurrent.TimeUnit
 
 object Helpers {
@@ -26,6 +28,15 @@ object Helpers {
                     "${if(seconds<10) "0" else ""}$seconds:" +
                     "${if(milliSeconds<10) "0" else ""}$milliSeconds"
 
+    }
+
+    fun convertMetersToKM(mts:Float):Float{
+
+        val km = mts*0.001f
+
+        val roundKM = Math.round(km * 1000.0f) / 1000.0f
+
+        return roundKM
     }
 
 }
