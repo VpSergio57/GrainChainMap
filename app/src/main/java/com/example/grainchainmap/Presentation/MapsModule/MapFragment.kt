@@ -7,6 +7,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -16,6 +19,7 @@ import com.afollestad.materialdialogs.input.input
 import com.example.grainchainmap.GrainChainMapApplication
 import com.example.grainchainmap.R
 import com.example.grainchainmap.databinding.FragmentMapBinding
+import com.example.grainchainmap.domain.LatLngData
 import com.example.grainchainmap.domain.entities.RutaEntity
 import com.example.grainchainmap.utils.Permissions
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -33,6 +37,7 @@ class MapFragment : Fragment(), MyRouteRecyclerViewAdapter.RouteItemListener, Ea
 
     private var _binding:FragmentMapBinding? = null
     private val binding get() = _binding!!
+    private lateinit var viewModel: MapViewModel
     private lateinit var myAdapter: MyRouteRecyclerViewAdapter
 
     private var columnCount = 1
@@ -64,21 +69,28 @@ class MapFragment : Fragment(), MyRouteRecyclerViewAdapter.RouteItemListener, Ea
             }
         }
 
-        //myAdapter.addRoutes( provData() )
-
         binding.stopStartBtn.setOnClickListener {
-            saveProcess()//Deberia de ir en el MVVM
+            saveProcess()
         }
 
-        getRutesFromRoom()
 
         return binding.root
     }
 
-    private fun getRutesFromRoom(){
-        CoroutineScope(Dispatchers.IO).launch{
-            val routes = GrainChainMapApplication.database.routeDao().getAllRoutes()
-            myAdapter.addRoutes( routes )
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        viewModel = ViewModelProvider(this).get(MapViewModel::class.java)
+        viewModel.observeRoutes().observe(viewLifecycleOwner, Observer {
+            myAdapter.reloadRoutes(it)
+        })
+
+        viewModel.loadRoutes()
+
+        if(Permissions.hasLocationPermission(requireContext())){
+            startMapLocation()
+        } else{
+            Permissions.requestLocationPermission(this)
         }
     }
 
@@ -86,60 +98,17 @@ class MapFragment : Fragment(), MyRouteRecyclerViewAdapter.RouteItemListener, Ea
         MaterialDialog(requireContext()).show {
             message(R.string.alert_add_route_messaje)
             input(allowEmpty = true) { dialog, text ->
-                // Text submitted with the action button, might be an empty string`
-
-//                val esta = RutaEntity(7, "Ruta Casa de Goyis", 2.7f, "00:30" , arrayListOf( LatLngData(20.340957872197734, -102.03038005241035), LatLngData(20.380957872197734, -102.00038005241035) ))
-//
-//                Thread {
-//                    GrainChainMapApplication.database.routeDao().addRoute(esta)
-//                }.start()
-
+                //viewModel.addRoute(RutaEntity( name = text.toString(), km = 26.0f, time = "08:09" , latlongList = arrayListOf( LatLngData(20.361620999888242 ,-102.01978700011176), LatLngData(20.406620998882413 ,-101.97478700111759) ) ))
+                viewModel.addRoute(RutaEntity(name = text.toString(), km = 26.0f, time = "08:09" , latlongList = arrayListOf( LatLngData(20.361620999888242 ,-102.01978700011176), LatLngData(20.406620998882413 ,-101.97478700111759) ) ))
             }
             positiveButton(R.string.alerts_save)
             negativeButton(R.string.alerts_discard)
         }
     }
 
-
-//    fun tempRouteGenerator():ArrayList<LatLngData>{
-//        var list= arrayListOf<LatLngData>()
-//        var tempLat = 20.356621
-//        var temoLong = -102.024787
-//        var coorInit = LatLngData(tempLat, temoLong)
-//
-//        list.add(coorInit)
-//
-//        for(i in 1..10){
-//
-//            tempLat += 0.005f
-//            temoLong += 0.005f
-//            list.add( LatLngData(tempLat, temoLong))
-//        }
-//        return list
-//    }
-
-//    fun provData() : ArrayList<RutaEntity>{
-//        var myList = arrayListOf<RutaEntity>()
-//
-//        myList.add(RutaEntity(1, "Ruta Casa de Llamitas", 6.6f,"06:09" ,arrayListOf( LatLngData(20.361620999888242 ,-102.01978700011176), LatLngData(20.406620998882413 ,-101.97478700111759) ) ))
-//        myList.add(RutaEntity(2, "Ruta Casa de Alma", 0.9f,"00:45" , arrayListOf( LatLngData(20.353564716826344, -102.03763838137967), LatLngData(20.393564716826344, -102.00763838137967) ) ))
-//        myList.add(RutaEntity(7, "Ruta Casa de Goyis", 2.7f, "00:30" , arrayListOf( LatLngData(20.340957872197734, -102.03038005241035), LatLngData(20.380957872197734, -102.00038005241035) )))
-//
-//        return myList
-//    }
-
     private fun startMapLocation(){
         val mapFragment = childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment?
         mapFragment?.getMapAsync(callback)
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        if(Permissions.hasLocationPermission(requireContext())){
-            startMapLocation()
-        }else{
-            Permissions.requestLocationPermission(this)
-        }
     }
 
     override fun onclickRouteItem(v: View, route: RutaEntity) {

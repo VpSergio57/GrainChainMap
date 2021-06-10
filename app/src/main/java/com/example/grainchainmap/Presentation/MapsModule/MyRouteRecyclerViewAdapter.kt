@@ -25,14 +25,15 @@ class MyRouteRecyclerViewAdapter( private val listener: RouteItemListener
     private val routes = mutableListOf<RutaEntity>()
     private lateinit var context: Context
 
-    fun addRoutes( myRoutes: MutableList<RutaEntity>){
+    fun reloadRoutes( myRoutes: MutableList<RutaEntity>){
+        clearRoutes()
         this.routes.addAll(myRoutes)
         notifyDataSetChanged()
     }
 
-    fun clearRoutes(){
+    private fun clearRoutes(){
         this.routes.clear()
-        notifyDataSetChanged()
+        //notifyDataSetChanged()
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
