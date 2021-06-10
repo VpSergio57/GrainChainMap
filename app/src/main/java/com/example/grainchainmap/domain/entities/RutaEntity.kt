@@ -5,7 +5,7 @@ import android.os.Parcelable
 import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
-import com.example.grainchainmap.domain.LatLngData
+import com.google.android.gms.maps.model.LatLng
 import kotlinx.parcelize.Parcelize
 
 
@@ -16,5 +16,5 @@ data class RutaEntity(
     var name:String = "",
     var km:Float = 0f,
     var time: String = "", //Aun no se si se calcular'a despues y no por la api
-    var latlongList: MutableList<LatLngData>
+    var latlongList: MutableList<LatLng>
 ): Parcelable
