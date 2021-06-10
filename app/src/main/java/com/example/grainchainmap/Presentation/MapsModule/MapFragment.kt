@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.res.ColorStateList
 import android.graphics.Color
+import android.location.Location
 import androidx.fragment.app.Fragment
 
 import android.os.Bundle
@@ -52,7 +53,7 @@ class MapFragment : Fragment(), MyRouteRecyclerViewAdapter.RouteItemListener, Ea
     private var isTracking = false
     private var pathPoint = mutableListOf<LatLng>()
     private var curTimeInMillis = 0L
-
+    private var totalDistance = 0f
 
     private val callback = OnMapReadyCallback { googleMap ->
         map = googleMap
@@ -198,7 +199,18 @@ class MapFragment : Fragment(), MyRouteRecyclerViewAdapter.RouteItemListener, Ea
                 .add(preLastLasLong)
                 .add(lstLasLong)
             map?.addPolyline(polylineOptions)
+
+            val result = FloatArray(1)
+            Location.distanceBetween(
+                preLastLasLong.latitude,
+                preLastLasLong.longitude,
+                lstLasLong.latitude,
+                lstLasLong.longitude,
+                result
+            )
+            totalDistance += result[0]
         }
+
     }
 
     private fun saveProcess(locations:MutableList<LatLng>) {
@@ -211,7 +223,7 @@ class MapFragment : Fragment(), MyRouteRecyclerViewAdapter.RouteItemListener, Ea
                     viewModel.addRoute(
                         RutaEntity(
                             name = text.toString(),
-                            km = 26.0f,
+                            km = totalDistance,
                             time = Helpers.getFoormatteStopWachTime(curTimeInMillis),
                             latlongList = locations
                         )
