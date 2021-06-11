@@ -11,8 +11,8 @@ object Constants {
     const val ACTION_STOP_SERVICE = "ACTION_STOP_SERVICE"
 
     //
-    const val LOCATION_UPDATE_INTERVAL = 5000L
-    const val FASTEST_LOCATION_INTERVAL = 2000L
+    const val LOCATION_UPDATE_INTERVAL = 3000L
+    const val FASTEST_LOCATION_INTERVAL = 1500L
     const val POLYLINE_WIDTH = 8f
     const val MAP_ZOOM = 16.5f
 

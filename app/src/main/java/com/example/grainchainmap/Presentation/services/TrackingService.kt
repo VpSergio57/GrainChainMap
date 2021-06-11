@@ -129,10 +129,9 @@ class TrackingService: LifecycleService() {
         location?.let {
             val pos = LatLng(location.latitude, location.longitude)
             pathPoint.value?.apply {
-                add(pos)
-                pathPoint.postValue(this)
+                    add(pos)
+                    pathPoint.postValue(this)
             }
         }
     }
-
 }

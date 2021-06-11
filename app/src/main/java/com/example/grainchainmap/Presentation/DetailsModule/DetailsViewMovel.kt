@@ -1,5 +1,6 @@
 package com.example.grainchainmap.Presentation.DetailsModule
 
+import android.widget.Toast
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -26,5 +27,6 @@ class DetailsViewMovel:ViewModel() {
             }
         }
     }
+
 
 }

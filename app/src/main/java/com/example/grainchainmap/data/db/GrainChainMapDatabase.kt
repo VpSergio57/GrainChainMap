@@ -6,7 +6,7 @@ import androidx.room.TypeConverters
 import com.example.grainchainmap.domain.entities.RutaEntity
 import com.example.grainchainmap.utils.Converters
 
-@Database(entities = arrayOf(RutaEntity::class), version = 1)
+@Database(entities = arrayOf(RutaEntity::class), version = 2)
 @TypeConverters(Converters::class)
 abstract class GrainChainMapDatabase:RoomDatabase() {
 

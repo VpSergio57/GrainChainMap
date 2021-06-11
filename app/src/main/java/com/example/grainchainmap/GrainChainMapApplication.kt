@@ -17,6 +17,7 @@ class GrainChainMapApplication:Application() {
             this,
             GrainChainMapDatabase::class.java,
             "GrainChainMapDB")
+            .fallbackToDestructiveMigration()
         .build()
     }
 

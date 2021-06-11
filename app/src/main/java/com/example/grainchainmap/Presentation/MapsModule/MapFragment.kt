@@ -1,7 +1,9 @@
 package com.example.grainchainmap.Presentation.MapsModule
 
+import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.content.res.ColorStateList
 import android.graphics.Color
 import android.location.Location
@@ -13,6 +15,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.appcompat.content.res.AppCompatResources
+import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -32,6 +35,8 @@ import com.example.grainchainmap.utils.Constants.MAP_ZOOM
 import com.example.grainchainmap.utils.Constants.POLYLINE_WIDTH
 import com.example.grainchainmap.utils.Helpers
 import com.example.grainchainmap.utils.Permissions
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
@@ -46,6 +51,7 @@ class MapFragment : Fragment(), MyRouteRecyclerViewAdapter.RouteItemListener, Ea
     private var _binding:FragmentMapBinding? = null
     private val binding get() = _binding!!
     private lateinit var map:GoogleMap
+    private lateinit var fusedLocationClient: FusedLocationProviderClient
     private lateinit var viewModel: MapViewModel
     private lateinit var myAdapter: MyRouteRecyclerViewAdapter
     private var columnCount = 1
@@ -54,13 +60,21 @@ class MapFragment : Fragment(), MyRouteRecyclerViewAdapter.RouteItemListener, Ea
     private var curTimeInMillis = 0L
     private var totalDistance = 0f
 
+    @SuppressLint("MissingPermission")
     private val callback = OnMapReadyCallback { googleMap ->
         map = googleMap
-        val sydney = LatLng(20.35662107969063, -102.02478747217472)
-        googleMap.isMyLocationEnabled = true
-       // googleMap.addMarker(MarkerOptions().position(sydney).title("Marker in Sydney"))
-        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(sydney,16.5f))
+        var currentLocation = LatLng(20.35662107969063, -102.02478747217472)
 
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity())
+
+        fusedLocationClient.lastLocation
+            .addOnSuccessListener { location : Location? ->
+                if(location != null){
+                    currentLocation = LatLng(location.latitude, location.longitude)
+                }
+                googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom( currentLocation,16.5f))
+            }
+        googleMap.isMyLocationEnabled = true
     }
 
     override fun onCreateView(
@@ -155,22 +169,6 @@ class MapFragment : Fragment(), MyRouteRecyclerViewAdapter.RouteItemListener, Ea
         }
     }
 
-//    private fun zoomToSeeWholeTrack(){
-//        val bounds = LatLngBounds.Builder()
-//        for(pos in pathPoint){
-//            bounds.include(pos)
-//        }
-//
-//        map?.moveCamera(
-//            CameraUpdateFactory.newLatLngBounds(
-//                bounds.build(),
-//                binding.mainLayout.width,
-//                binding.mainLayout.height,
-//                (binding.mainLayout.height * 0.05f).toInt()
-//            )
-//        )
-//    }
-
     private fun moveCamera(){
         if(pathPoint.isNotEmpty()){
             map?.animateCamera(
@@ -217,9 +215,7 @@ class MapFragment : Fragment(), MyRouteRecyclerViewAdapter.RouteItemListener, Ea
         MaterialDialog(requireContext()).show {
             message(R.string.alert_add_route_messaje)
             input(allowEmpty = false) { dialog, text ->
-
                 if(locations.isNotEmpty()) {
-                    //zoomToSeeWholeTrack()
                     viewModel.addRoute(
                         RutaEntity(
                             name = text.toString(),
@@ -228,6 +224,7 @@ class MapFragment : Fragment(), MyRouteRecyclerViewAdapter.RouteItemListener, Ea
                             latlongList = locations
                         )
                     )
+                    addMarkers()
                     Toast.makeText( requireContext(), getString(R.string.message_save_route), Toast.LENGTH_LONG).show()
                 }
                 else{
@@ -235,12 +232,24 @@ class MapFragment : Fragment(), MyRouteRecyclerViewAdapter.RouteItemListener, Ea
                 }
 
             }
-            negativeButton {
-                //cleanScreen()
-            }
             positiveButton(R.string.alerts_save)
             negativeButton(R.string.alerts_discard)
         }
+    }
+
+    private fun addMarkers() {
+        map.addMarker(
+            MarkerOptions()
+                .position(pathPoint.first())
+                .title(getString(R.string.marker_start))
+                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED))
+        )
+        map.addMarker(
+            MarkerOptions()
+                .position(pathPoint.last())
+                .title(getString(R.string.marker_end))
+                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN))
+        )
     }
 
     private fun sendComandtoService(action:String) = Intent(requireContext(), TrackingService::class.java).also {
@@ -249,7 +258,6 @@ class MapFragment : Fragment(), MyRouteRecyclerViewAdapter.RouteItemListener, Ea
     }
 
     override fun onclickRouteItem(v: View, route: RutaEntity) {
-        //Toast.makeText(requireContext(), "${route.name} son ${route.km}", Toast.LENGTH_SHORT).show()
         val action = MapFragmentDirections.actionMapFragmentToDetailsFragment(route)
         findNavController().navigate(action)
     }

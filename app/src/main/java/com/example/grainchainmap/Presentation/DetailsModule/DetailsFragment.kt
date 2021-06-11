@@ -1,6 +1,7 @@
 package com.example.grainchainmap.Presentation.DetailsModule
 
 import android.app.AlertDialog
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
@@ -19,6 +20,7 @@ import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
+import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.gms.maps.model.PolylineOptions
@@ -37,11 +39,8 @@ class DetailsFragment : Fragment() {
 
     private val callback = OnMapReadyCallback { googleMap ->
         map = googleMap
-        val sydney = LatLng(20.35662107969063, -102.02478747217472)
-
         addPolyline(route.latlongList)
-
-        //googleMap.addMarker(MarkerOptions().position(sydney).title("Marker in Sydney"))
+        addMarkers()
         googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom( route.latlongList[0],15.0f))
     }
 
@@ -57,7 +56,6 @@ class DetailsFragment : Fragment() {
             .build()
 
         (requireActivity() as AppCompatActivity).supportActionBar?.title = route.name
-        // Inflate the layout for this fragment
 
         val mapFragment = childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment?
         mapFragment?.getMapAsync(callback)
@@ -71,7 +69,16 @@ class DetailsFragment : Fragment() {
 
         }
 
+        binding.btnShare.setOnClickListener {
+            val sendIntent: Intent = Intent().apply {
+                action = Intent.ACTION_SEND
+                putExtra(Intent.EXTRA_TEXT, "El día de hoy recorrí ${route.km} KM en ${route.time} HRS")
+                type = "text/plain"
+            }
 
+            val shareIntent = Intent.createChooser(sendIntent, null)
+            startActivity(shareIntent)
+        }
 
         return binding.root
     }
@@ -89,7 +96,6 @@ class DetailsFragment : Fragment() {
 
     private fun addPolyline(points: MutableList<LatLng>){
         if(points.isNotEmpty() && points.size>1){
-
             for(i in 1 until points.size){
                 Log.d("DETAILS", "${points[i-1]} , ${points[i]}")
                 val preLastLasLong = points[i-1]
@@ -102,6 +108,21 @@ class DetailsFragment : Fragment() {
                 map?.addPolyline(polylineOptions)
             }
         }
+    }
+
+      private fun addMarkers() {
+        map.addMarker(
+            MarkerOptions()
+                .position(route.latlongList.first())
+                .title(getString(R.string.marker_start))
+                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED))
+        )
+        map.addMarker(
+            MarkerOptions()
+                .position(route.latlongList.last())
+                .title(getString(R.string.marker_end))
+                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN))
+        )
     }
 
     override fun onDestroyView() {

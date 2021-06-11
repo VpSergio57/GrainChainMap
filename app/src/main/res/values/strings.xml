@@ -13,4 +13,7 @@
     <string name="permisos_ok">Permisos Aceptados!!</string>
     <string name="messahe_nolocations">Debes caminar o correr para guardar una ruta</string>
     <string name="message_save_route">Ruta guardada!!</string>
+
+    <string name="marker_start">Inicio de Ruta</string>
+    <string name="marker_end">Fin de Ruta</string>
 </resources>
